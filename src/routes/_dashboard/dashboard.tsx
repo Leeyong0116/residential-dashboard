@@ -7,10 +7,64 @@ export const Route = createFileRoute('/_dashboard/dashboard')({
     component: DashboardPage,
 })
 
+import * as React from 'react'
 import { useMockData } from '../../context/MockDataContext'
 
 function DashboardPage() {
     const { stats, entries } = useMockData()
+    const videoRef = React.useRef<HTMLVideoElement | null>(null)
+    const streamRef = React.useRef<MediaStream | null>(null)
+    const [error, setError] = React.useState<string | null>(null)
+
+    // Handle stream fetching
+    React.useEffect(() => {
+        let mounted = true
+
+        async function getCamera() {
+            try {
+                // Request camera access
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true
+                })
+
+                if (!mounted) {
+                    stream.getTracks().forEach(track => track.stop())
+                    return
+                }
+
+                streamRef.current = stream
+                setError(null)
+
+                // Attach to video if it exists
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream
+                    videoRef.current.play().catch(e => console.error("Error playing video:", e))
+                }
+            } catch (err) {
+                console.error("Error accessing webcam:", err)
+                if (mounted) {
+                    setError("Camera unavailable")
+                }
+            }
+        }
+
+        getCamera()
+
+        return () => {
+            mounted = false
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop())
+            }
+        }
+    }, [])
+
+    const setVideoRef = React.useCallback((node: HTMLVideoElement | null) => {
+        videoRef.current = node
+        if (node && streamRef.current) {
+            node.srcObject = streamRef.current
+            node.play().catch(e => console.error("Error playing video:", e))
+        }
+    }, [])
 
     return (
         <div className="space-y-6">
@@ -94,13 +148,27 @@ function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 gap-2">
-                            {[1, 2, 3, 4].map((_, i) => (
+                            {[1, 2, 3, 4].map((id, i) => (
                                 <div key={i} className="aspect-video rounded bg-slate-950/50 border border-white/5 relative overflow-hidden group">
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xs text-slate-500">Cam {i + 1}</span>
-                                    </div>
-                                    {/* Overlay */}
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all" />
+                                    {i === 0 && !error ? (
+                                        <video
+                                            ref={setVideoRef}
+                                            autoPlay
+                                            muted
+                                            playsInline
+                                            onLoadedMetadata={(e) => e.currentTarget.play()}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <>
+                                            <div className="absolute inset-0 flex items-center justify-center flex-col">
+                                                <span className="text-xs text-slate-500">Cam {id}</span>
+                                                {i === 0 && error && <span className="text-[10px] text-red-400 mt-1">{error}</span>}
+                                            </div>
+                                            {/* Overlay */}
+                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all" />
+                                        </>
+                                    )}
                                 </div>
                             ))}
                         </div>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode } from 'react'
 
 export interface User {
     id: number
@@ -36,7 +36,6 @@ interface MockDataContextType {
         totalVisitors: number
         residentsActive: number
         vehiclesLogged: number
-        info: string
     }
 }
 
@@ -87,7 +86,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         totalVisitors: entries.filter(e => e.type === "Visitor").length + 5400, // Mock base value
         residentsActive: users.filter(u => u.role === "Resident" && u.status === "Active").length + 1890, // Mock base value
         vehiclesLogged: entries.length + 12200, // Mock base value
-        info: "Mock Data Active"
     }
 
     return (
