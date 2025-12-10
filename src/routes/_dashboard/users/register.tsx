@@ -28,7 +28,10 @@ function RegisterUserPage() {
             phone: formData.phone,
             role: formData.role as any,
             unit: formData.unit,
-            vehicles: formData.vehicles.split(",").map(v => v.trim()).filter(Boolean),
+            vehicles: formData.vehicles.split(",").map(v => ({
+                plate: v.trim(),
+                photoUrl: "" // Default empty photo for new users
+            })).filter(v => v.plate),
         })
         navigate({ to: '/users' })
     }

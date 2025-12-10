@@ -4,6 +4,7 @@ import { Card, CardContent } from '../../components/ui/card'
 import { Maximize2, Minimize2, Settings, Video } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Button } from '../../components/ui/button'
+import { useMockData } from '../../context/MockDataContext'
 
 export const Route = createFileRoute('/_dashboard/camera')({
     component: CameraPage,
@@ -11,14 +12,35 @@ export const Route = createFileRoute('/_dashboard/camera')({
 
 
 function CameraPage() {
+    const { isCameraOn, toggleCamera } = useMockData()
     const [fullscreenCamId, setFullscreenCamId] = React.useState<number | null>(null)
     const [error, setError] = React.useState<string | null>(null)
+    const [currentTime, setCurrentTime] = React.useState(new Date().toLocaleTimeString())
     const videoRef = React.useRef<HTMLVideoElement | null>(null)
     const streamRef = React.useRef<MediaStream | null>(null)
+
+    // Update time every second
+    React.useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date().toLocaleTimeString())
+        }, 1000)
+        return () => clearInterval(timer)
+    }, [])
 
     // Handle stream fetching
     React.useEffect(() => {
         let mounted = true
+
+        if (!isCameraOn) {
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop())
+                streamRef.current = null
+            }
+            if (videoRef.current) {
+                videoRef.current.srcObject = null
+            }
+            return
+        }
 
         async function getCamera() {
             try {
@@ -56,7 +78,7 @@ function CameraPage() {
                 streamRef.current.getTracks().forEach(track => track.stop())
             }
         }
-    }, [])
+    }, [isCameraOn])
 
     // Callback to handle video element mounting/remounting
     const setVideoRef = React.useCallback((node: HTMLVideoElement | null) => {
@@ -90,6 +112,14 @@ function CameraPage() {
                     <p className="text-slate-400">Monitor entry points and perimeter</p>
                 </div>
                 <div className="flex gap-2">
+                    <Button
+                        variant={isCameraOn ? "outline" : "default"}
+                        className={isCameraOn ? "border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300" : "bg-emerald-600 hover:bg-emerald-500 text-white border-0"}
+                        onClick={toggleCamera}
+                    >
+                        <Video className="mr-2 h-4 w-4" />
+                        {isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
+                    </Button>
                     <Button variant="outline"><Settings className="mr-2 h-4 w-4" /> Camera Config</Button>
                 </div>
             </div>
@@ -120,7 +150,7 @@ function CameraPage() {
                             <CardContent className="p-0 relative h-full w-full group">
                                 {/* Camera Feed */}
                                 <div className="absolute inset-0 bg-slate-900 flex items-center justify-center overflow-hidden">
-                                    {cam.id === 1 && !error ? (
+                                    {cam.id === 1 && !error && isCameraOn ? (
                                         <video
                                             ref={setVideoRef}
                                             autoPlay
@@ -132,8 +162,10 @@ function CameraPage() {
                                     ) : (
                                         <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-slate-800 to-slate-900">
                                             <Video className="h-12 w-12 text-slate-700 opacity-20 mb-2" />
-                                            {cam.id === 1 && error && (
-                                                <span className="text-red-400 text-sm">Failed to load feed</span>
+                                            {cam.id === 1 && (
+                                                <span className="text-slate-500 text-sm">
+                                                    {error ? "Failed to load feed" : !isCameraOn ? "Camera Off" : "Connecting..."}
+                                                </span>
                                             )}
                                         </div>
                                     )}
@@ -166,7 +198,7 @@ function CameraPage() {
                                 </div>
 
                                 <div className="absolute bottom-4 left-4 font-mono text-xs text-green-400 shadow-black drop-shadow-sm z-10">
-                                    REC 00:04:23
+                                    {currentTime}
                                 </div>
                                 <div className="absolute bottom-4 right-4 font-mono text-xs text-white/50 z-10">
                                     1080p | 30fps

@@ -26,7 +26,9 @@ function UsersPage() {
     const filteredUsers = users.filter(user =>
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.unit.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.vehicles.some(v => v.toLowerCase().includes(searchQuery.toLowerCase()))
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.unit.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.vehicles.some(v => v.plate.toLowerCase().includes(searchQuery.toLowerCase()))
     )
 
     return (
@@ -63,7 +65,8 @@ function UsersPage() {
                                 <TableHead>Name</TableHead>
                                 <TableHead>Role</TableHead>
                                 <TableHead>Unit</TableHead>
-                                <TableHead>Vehicles</TableHead>
+                                <TableHead>Unit</TableHead>
+                                <TableHead>Assets</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -75,7 +78,29 @@ function UsersPage() {
                                         <TableCell className="font-medium text-white">{user.name}</TableCell>
                                         <TableCell>{user.role}</TableCell>
                                         <TableCell>{user.unit}</TableCell>
-                                        <TableCell>{user.vehicles.join(", ") || "-"}</TableCell>
+                                        <TableCell>{user.unit}</TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col gap-2">
+                                                {user.vehicles && user.vehicles.length > 0 ? (
+                                                    user.vehicles.map((v, i) => (
+                                                        <div key={i} className="flex items-center gap-2">
+                                                            <div className="h-8 w-12 rounded overflow-hidden bg-slate-800">
+                                                                {v.photoUrl ? (
+                                                                    <img src={v.photoUrl} alt={v.plate} className="h-full w-full object-cover" />
+                                                                ) : (
+                                                                    <div className="h-full w-full flex items-center justify-center text-xs text-slate-500">No Img</div>
+                                                                )}
+                                                            </div>
+                                                            <span className="text-xs font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-300 border border-slate-700">
+                                                                {v.plate}
+                                                            </span>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <span className="text-slate-500">-</span>
+                                                )}
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             <span className={cn(
                                                 "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset",
@@ -85,9 +110,13 @@ function UsersPage() {
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white">
+                                            <Link
+                                                to="/users/$userId"
+                                                params={{ userId: user.id.toString() }}
+                                                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 disabled:pointer-events-none disabled:opacity-50"
+                                            >
                                                 <Edit className="h-4 w-4" />
-                                            </Button>
+                                            </Link>
                                             <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-400">
                                                 <Trash className="h-4 w-4" />
                                             </Button>
