@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Button } from '../../components/ui/button'
 import { Users, UserCheck, Car } from 'lucide-react'
 import { cn } from '../../lib/utils'
-import { Toast } from '../../components/ui/toast-custom'
 import * as React from 'react'
 import { useMockData } from '../../context/MockDataContext'
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, Tooltip } from 'recharts'
@@ -81,7 +80,6 @@ function DashboardPage() {
 
     return (
         <div className="space-y-6">
-            <Toast />
             <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold tracking-tight text-white">Dashboard</h2>
                 <div className="flex items-center space-x-2">

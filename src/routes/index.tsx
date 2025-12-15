@@ -2,6 +2,12 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { ShieldCheck, User, Lock } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../lib/firebase'
+import { useAuth } from '../context/AuthContext'
+import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
     component: LoginPage,
@@ -9,12 +15,35 @@ export const Route = createFileRoute('/')({
 
 function LoginPage() {
     const navigate = useNavigate()
+    const { user, loading: authLoading } = useAuth()
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false)
 
-    const handleLogin = (e: React.FormEvent) => {
+    useEffect(() => {
+        if (!authLoading && user) {
+            navigate({ to: '/dashboard' })
+        }
+    }, [user, authLoading, navigate])
+
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
-        // Simulated login
-        navigate({ to: '/dashboard' })
+        setLoading(true)
+        try {
+            await signInWithEmailAndPassword(auth, email, password)
+            toast.success('Welcome back!')
+            navigate({ to: '/dashboard' })
+        } catch (error: any) {
+            console.error(error)
+            toast.error('Login Failed', {
+                description: 'Invalid email or password'
+            })
+        } finally {
+            setLoading(false)
+        }
     }
+
+    if (authLoading) return null // Or a spinner
 
     return (
         <div className="relative flex h-screen w-full items-center justify-center bg-slate-950 overflow-hidden">
@@ -36,16 +65,34 @@ function LoginPage() {
                     <form onSubmit={handleLogin} className="w-full space-y-4">
                         <div className="relative">
                             <User className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
-                            <Input placeholder="Username" className="pl-10" />
+                            <Input
+                                placeholder="Email"
+                                type="email"
+                                className="pl-10 text-white"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
                         </div>
 
                         <div className="relative">
                             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
-                            <Input type="password" placeholder="Password" className="pl-10" />
+                            <Input
+                                type="password"
+                                placeholder="Password"
+                                className="pl-10 text-white"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
                         </div>
 
-                        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 h-11 text-base">
-                            Sign In
+                        <Button
+                            type="submit"
+                            className="w-full bg-indigo-600 hover:bg-indigo-500 h-11 text-base"
+                            disabled={loading}
+                        >
+                            {loading ? <Loader2 className="animate-spin" /> : "Sign In"}
                         </Button>
                     </form>
 

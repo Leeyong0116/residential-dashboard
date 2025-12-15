@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react'
+import { toast } from 'sonner'
 import type { ReactNode } from 'react'
 
 export interface User {
@@ -53,7 +54,6 @@ interface MockDataContextType {
     markAllRead: () => void
     isGateOpen: boolean
     toggleGate: () => void
-    lastNotification: Notification | null
 }
 
 export interface Notification {
@@ -181,8 +181,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
 
     const toggleCamera = () => setIsCameraOn(prev => !prev)
 
-    const [lastNotification, setLastNotification] = useState<Notification | null>(null)
-
     const addNotification = (message: string) => {
         const newNotification: Notification = {
             id: Date.now(),
@@ -191,10 +189,11 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
             read: false
         }
         setNotifications([newNotification, ...notifications])
-        setLastNotification(newNotification)
 
-        // Clear toast after 3 seconds
-        setTimeout(() => setLastNotification(null), 3000)
+        // Trigger Sonner toast
+        toast(message, {
+            description: newNotification.time,
+        })
     }
 
     const markAllRead = () => {
@@ -203,11 +202,9 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
 
     const [isGateOpen, setIsGateOpen] = useState(false)
     const toggleGate = () => {
-        setIsGateOpen(prev => {
-            const newState = !prev
-            addNotification(newState ? "Main Gate Opened" : "Main Gate Closed")
-            return newState
-        })
+        const newState = !isGateOpen
+        setIsGateOpen(newState)
+        addNotification(newState ? "Main Gate Opened" : "Main Gate Closed")
     }
 
     return (
@@ -228,7 +225,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
             markAllRead,
             isGateOpen,
             toggleGate,
-            lastNotification
         }}>
             {children}
         </MockDataContext.Provider>
