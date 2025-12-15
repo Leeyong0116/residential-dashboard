@@ -1,73 +1,41 @@
-# React + TypeScript + Vite
+# Residential Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive dashboard for managing residential data, including users, visitors, and residents.
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
 
-## React Compiler
+2.  **Start the Development Server**
+    ```bash
+    npm run dev
+    ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+3.  **Build for Production**
+    ```bash
+    npm run build
+    ```
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+-   **Framework**: [React](https://react.dev/) + [Vite](https://vitejs.dev/)
+-   **Language**: [TypeScript](https://www.typescriptlang.org/)
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+-   **Routing**: [TanStack Router](https://tanstack.com/router)
+-   **Icons**: [Lucide React](https://lucide.dev/)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Project Structure
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Here is an overview of the essential folders in the project:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+-   **`src/routes/`**: Contains the file-based routing logic for TanStack Router. Each file or folder represents a route in the application (e.g., `_dashboard` is the main layout for dashboard pages).
+-   **`src/components/`**: Holds all React components.
+    -   **`layout/`**: Structural components like `Sidebar`, `Topbar`, and `DashboardShell`.
+    -   **`ui/`**: Reusable primitive UI components (buttons, inputs, cards) often styled with Tailwind.
+-   **`src/lib/`**: Utility functions, helpers, and configuration files (e.g., Firebase setup, common type definitions).
+-   **`src/context/`**: React Context providers for global state management (e.g., `AuthContext` for user authentication).
+-   **`src/assets/`**: Static assets such as images, fonts, and global SVGs.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
