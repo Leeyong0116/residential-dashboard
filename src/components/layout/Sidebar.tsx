@@ -1,5 +1,6 @@
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { LayoutDashboard, Shield, Users, Camera, LogOut } from "lucide-react"
+import { useAuth } from "../../context/AuthContext"
 
 
 const navItems = [
@@ -10,6 +11,14 @@ const navItems = [
 ]
 
 export function Sidebar() {
+    const { logout } = useAuth()
+    const navigate = useNavigate()
+
+    const handleLogout = async () => {
+        await logout()
+        navigate({ to: '/' })
+    }
+
     return (
         <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-white/10 bg-slate-950/50 backdrop-blur-xl transition-transform">
             <div className="flex h-16 items-center px-6 border-b border-white/10">
@@ -32,7 +41,10 @@ export function Sidebar() {
             </div>
 
             <div className="absolute bottom-4 left-0 w-full px-4">
-                <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                >
                     <LogOut className="h-5 w-5" />
                     <span className="font-medium">Logout</span>
                 </button>
