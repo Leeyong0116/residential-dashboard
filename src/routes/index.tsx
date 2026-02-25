@@ -3,47 +3,35 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { ShieldCheck, User, Lock } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/')(({
     component: LoginPage,
-})
+}))
 
 function LoginPage() {
     const navigate = useNavigate()
-    const { user, loading: authLoading } = useAuth()
+    const { user, login } = useAuth()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        if (!authLoading && user) {
+        if (user) {
             navigate({ to: '/dashboard' })
         }
-    }, [user, authLoading, navigate])
+    }, [user, navigate])
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleLogin = (e: React.FormEvent) => {
         e.preventDefault()
-        setLoading(true)
-        try {
-            await signInWithEmailAndPassword(auth, email, password)
-            toast.success('Welcome back!')
-            navigate({ to: '/dashboard' })
-        } catch (error: any) {
-            console.error(error)
-            toast.error('Login Failed', {
-                description: 'Invalid email or password'
-            })
-        } finally {
-            setLoading(false)
+        if (!email || !password) {
+            toast.error('Login Failed', { description: 'Please enter email and password' })
+            return
         }
+        login(email, password)
+        toast.success('Welcome back!')
+        navigate({ to: '/dashboard' })
     }
-
-    if (authLoading) return null // Or a spinner
 
     return (
         <div className="relative flex h-screen w-full items-center justify-center bg-slate-950 overflow-hidden">
@@ -67,7 +55,7 @@ function LoginPage() {
                             <User className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
                             <Input
                                 placeholder="Email"
-                                type="email"
+                                type="text"
                                 className="pl-10 text-white"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -78,7 +66,7 @@ function LoginPage() {
                         <div className="relative">
                             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-500" />
                             <Input
-                                type="password"
+                                type="text"
                                 placeholder="Password"
                                 className="pl-10 text-white"
                                 value={password}
@@ -90,9 +78,8 @@ function LoginPage() {
                         <Button
                             type="submit"
                             className="w-full bg-indigo-600 hover:bg-indigo-500 h-11 text-base"
-                            disabled={loading}
                         >
-                            {loading ? <Loader2 className="animate-spin" /> : "Sign In"}
+                            Sign In
                         </Button>
                     </form>
 
