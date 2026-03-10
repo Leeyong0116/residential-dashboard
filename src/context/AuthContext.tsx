@@ -1,37 +1,31 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 
-export interface User {
+export interface MockUser {
     email: string;
 }
 
 interface AuthContextType {
-    user: User | null;
-    loading: boolean;
-    login: (email: string) => Promise<void>;
-    logout: () => Promise<void>;
+    user: MockUser | null;
+    login: (email: string, password: string) => void;
+    logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [user, setUser] = useState<MockUser | null>(null);
 
-    const login = async (email: string) => {
-        setLoading(true);
-        // Simulate network request
-        await new Promise(resolve => setTimeout(resolve, 800));
+    const login = (email: string, _password: string) => {
         setUser({ email });
-        setLoading(false);
     };
 
-    const logout = async () => {
+    const logout = () => {
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
