@@ -6,6 +6,7 @@ import { cn } from '../../lib/utils'
 import * as React from 'react'
 import { useMockData } from '../../context/MockDataContext'
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, Tooltip } from 'recharts'
+import dayjs from 'dayjs'
 
 export const Route = createFileRoute('/_dashboard/dashboard')({
     component: DashboardPage,
@@ -84,7 +85,7 @@ function DashboardPage() {
                 <h2 className="text-3xl font-bold tracking-tight text-white">Dashboard</h2>
                 <div className="flex items-center space-x-2">
                     {/* Date placeholder */}
-                    <span className="text-sm text-slate-400">Oct 24, 2025</span>
+                    <span className="text-sm text-slate-400">{dayjs().format('MMM DD, YYYY')}</span>
                 </div>
             </div>
 

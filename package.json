@@ -12,6 +12,7 @@
   "dependencies": {
     "@tanstack/react-router": "^1.139.16",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.19",
     "firebase": "^12.6.0",
     "lucide-react": "^0.556.0",
     "react": "^19.2.0",
