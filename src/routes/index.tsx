@@ -3,8 +3,6 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { ShieldCheck, User, Lock } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
@@ -15,7 +13,7 @@ export const Route = createFileRoute('/')({
 
 function LoginPage() {
     const navigate = useNavigate()
-    const { user, loading: authLoading } = useAuth()
+    const { user, loading: authLoading, login } = useAuth()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
@@ -30,7 +28,7 @@ function LoginPage() {
         e.preventDefault()
         setLoading(true)
         try {
-            await signInWithEmailAndPassword(auth, email, password)
+            await login(email)
             toast.success('Welcome back!')
             navigate({ to: '/dashboard' })
         } catch (error: any) {
